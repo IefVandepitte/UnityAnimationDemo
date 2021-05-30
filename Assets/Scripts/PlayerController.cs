@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public float upLimit = -50f;
     public float downLimit = 50f;
 
+
     public Animator animator;
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
     {
         Move();
         Rotate();
+        KeyBoardRotate();
     }
 
     private void Rotate()
@@ -45,11 +47,43 @@ public class PlayerController : MonoBehaviour
         currentRotation.x = Mathf.Clamp(currentRotation.x, upLimit, downLimit);
         cameraHolder.localRotation = Quaternion.Euler(currentRotation);
     }
+    
+    private void KeyBoardRotate()
+    {
+        float keyBoardRotationHorizontal = 0f;
+        float keyBoardRotationVertical = 0f;
+
+
+        bool up = Input.GetKey(KeyCode.F);
+        bool down = Input.GetKey(KeyCode.V);
+        bool left = Input.GetKey(KeyCode.C);
+        bool right = Input.GetKey(KeyCode.B);
+
+        float step = 0.1f;
+
+        if (left) keyBoardRotationHorizontal += step;
+        if (right) keyBoardRotationHorizontal -= step;
+        float horizontalRotation = keyBoardRotationHorizontal;
+
+        if (up) keyBoardRotationVertical += step;
+        if (down) keyBoardRotationVertical -= step;
+        float verticalRotation = keyBoardRotationVertical;
+
+
+
+        transform.Rotate(0, -horizontalRotation * mouseSensitivity, 0);
+        cameraHolder.Rotate(-verticalRotation * mouseSensitivity, 0, 0);
+
+        Vector3 currentRotation = cameraHolder.localEulerAngles;
+        if (currentRotation.x > 180) currentRotation.x -= 360;
+        currentRotation.x = Mathf.Clamp(currentRotation.x, upLimit, downLimit);
+        cameraHolder.localRotation = Quaternion.Euler(currentRotation);
+    }
 
     private void Move()
     {
-        float horizontalMove = Input.GetAxis("Horizontal");
-        float verticalMove = Input.GetAxis("Vertical");
+        float horizontalMove = Input.GetAxisRaw("Horizontal");
+        float verticalMove = Input.GetAxisRaw("Vertical");
 
         if (characterController.isGrounded) verticalSpeed = 0;
         else verticalSpeed -= gravity * Time.deltaTime;
